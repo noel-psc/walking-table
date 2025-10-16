@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "MotorContrl.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -328,6 +328,7 @@ void motor_move_entry(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	Set_PWM(7000,7000);
     osDelay(1);
   }
   /* USER CODE END motor_move_entry */
