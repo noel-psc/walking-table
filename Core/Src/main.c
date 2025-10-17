@@ -328,7 +328,7 @@ void motor_move_entry(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	Set_PWM(7000,7000);
+	Set_PWM(60000,60000);
     osDelay(1);
   }
   /* USER CODE END motor_move_entry */

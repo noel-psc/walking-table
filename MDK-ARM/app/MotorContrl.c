@@ -6,26 +6,29 @@
 ·µ»Ø  Öµ£ºÎÞ
 *************************************************************/
 void Set_PWM(int motor_left,int motor_right)
-{
+{	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4);
    if(motor_left>0)   
    {
-	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1,7200);
-	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2,7200-motor_left);
+	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1,65536);
+	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2,65536-motor_left);
    }
    else
    {
-	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1,7200+motor_left);
-	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2,7200);
+	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1,65536+motor_left);
+	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2,65536);
    }
    if(motor_right>0)
    {
-	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3,7200);
-	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4,7200-motor_right);
+	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3,65536);
+	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4,65536-motor_right);
    }
    else
    {
-	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3,7200+motor_right);
-	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4,7200);
+	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3,65536+motor_right);
+	   __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4,65536);
    }
 	
 	
