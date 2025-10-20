@@ -7,11 +7,10 @@
 返回  值：无
 *************************************************************/
 void Motor_contrl()
-{  
-   Start_PWM(&htim3);
-   Start_PWM(&htim5);
-   Set_PWM(&htim3,2000,2000);
-   Set_PWM(&htim5,2000,2000);
+{
+   Start_PWM();
+
+   Set_PWM(2000,2000);
 }
 void Set_PWM(TIM_HandleTypeDef *htim,int motor_left,int motor_right)
 {	motor_left = (motor_left > 7200) ? 7200 : motor_left;
