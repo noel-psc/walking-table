@@ -7,7 +7,7 @@
 
 extern TIM_HandleTypeDef htim3;
 void Set_PWM(int motor_left,int motor_right);
-void Motor_contrl(void);
+void Motor_contrl();
 void Stop_PWM(void);
 void Start_PWM(void);
 #endif

@@ -10,7 +10,7 @@ void Motor_contrl()
 {
    Start_PWM();
 
-   Set_PWM(2000,2000);
+   Set_PWM(7000,7000);
 }
 void Set_PWM(int motor_left,int motor_right)
 {	motor_left = (motor_left > 7200) ? 7200 : motor_left;
