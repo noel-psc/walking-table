@@ -573,6 +573,11 @@
               <FileType>1</FileType>
               <FilePath>.\app\MotorContrl.c</FilePath>
             </File>
+            <File>
+              <FileName>ax_ps2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\app\ax_ps2.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

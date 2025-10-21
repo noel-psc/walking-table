@@ -6,12 +6,12 @@
 入口参数：motor_left:左电机PWM值，motor_right:右电机PWM值
 返回  值：无
 *************************************************************/
-void Motor_contrl()
+void Motor_contrl(JOYSTICK_TypeDef JOYSTICK)
 {  
    Start_PWM(&htim3);
    Start_PWM(&htim5);
    Set_PWM(&htim3,2000,2000);
-   Set_PWM(&htim5,2000,2000);
+   Set_PWM(&htim5,JOYSTICK.RJoy_LR*10,JOYSTICK.RJoy_LR*10);
 }
 void Set_PWM(TIM_HandleTypeDef *htim,int motor_left,int motor_right)
 {	motor_left = (motor_left > 7200) ? 7200 : motor_left;

@@ -42,3 +42,4 @@ f405demo\motorcontrl.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_w
 f405demo\motorcontrl.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
 f405demo\motorcontrl.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
 f405demo\motorcontrl.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
+f405demo\motorcontrl.o: app\ax_ps2.h
