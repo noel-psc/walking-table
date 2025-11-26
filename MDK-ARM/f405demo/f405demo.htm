@@ -3,7 +3,7 @@
 <title>Static Call Graph - [f405demo\f405demo.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image f405demo\f405demo.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Thu Nov 13 17:37:14 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Wed Nov 26 19:27:38 2025
 <BR><P>
 <H3>Maximum Stack Usage =        392 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1088,8 +1088,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[df]"></a>HAL_UART_RxHalfCpltCallback</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, ax_ps2.o(i.HAL_UART_RxHalfCpltCallback))
-<BR><BR>[Called By]<UL><LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;remote_control_entry
-<LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_DMARxHalfCplt
+<BR><BR>[Called By]<UL><LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_DMARxHalfCplt
 </UL>
 
 <P><STRONG><a name="[c5]"></a>HAL_UART_TxCpltCallback</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, stm32f4xx_hal_uart.o(i.HAL_UART_TxCpltCallback))
@@ -1295,7 +1294,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f405xx.o(RESET)
 </UL>
-<P><STRONG><a name="[d8]"></a>fof_update</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, utils.o(i.fof_update))
+<P><STRONG><a name="[d8]"></a>fof_update</STRONG> (Thumb, 46 bytes, Stack size 0 bytes, utils.o(i.fof_update))
 <BR><BR>[Called By]<UL><LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Motor_contrl
 </UL>
 
@@ -1387,13 +1386,12 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[fd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;prvInitialiseNewTask
 </UL>
 
-<P><STRONG><a name="[61]"></a>remote_control_entry</STRONG> (Thumb, 54 bytes, Stack size 0 bytes, freertos.o(i.remote_control_entry))
+<P><STRONG><a name="[61]"></a>remote_control_entry</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, freertos.o(i.remote_control_entry))
 <BR><BR>[Stack]<UL><LI>Max Depth = 392<LI>Call Chain = remote_control_entry &rArr; parse_joystick_data &rArr; strtol &rArr; _strtoul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_joystick_data
 <LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr
-<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_RxHalfCpltCallback
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> freertos.o(i.MX_FREERTOS_Init)
 </UL>
