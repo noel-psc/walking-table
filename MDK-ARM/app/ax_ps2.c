@@ -24,29 +24,40 @@ void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 }
 // 解析摇杆数据函数
 uint8_t parse_joystick_data(const char* data, JOYSTICK_TypeDef* joy) {
-    const char* tokens[] = {"RJOY_LR:", "RJOY_UD:", "LJOY_LR:", "LJOY_UD:"};
-    uint8_t* values[] = {&joy->RJoy_LR, &joy->RJoy_UD, &joy->LJoy_LR, &joy->LJoy_UD};
-    int token_count = 4;
-    int found_count = 0;
-    
-    // 确保字符串以空字符结尾[5](@ref)
-    char working_data[RX_BUFFER_SIZE];
+//    const char* tokens[] = {"RJOY_LR:", "RJOY_UD:", "LJOY_LR:", "LJOY_UD:"};
+//    uint8_t* values[] = {&joy->RJoy_LR, &joy->RJoy_UD, &joy->LJoy_LR, &joy->LJoy_UD};
+//    int token_count = 4;
+//    int found_count = 0;
+//    
+//    // 确保字符串以空字符结尾[5](@ref)
+   uint8_t working_data[RX_BUFFER_SIZE];
     memcpy(working_data, data, RX_BUFFER_SIZE);
-    working_data[255] = '\0';
+	
+	
+	
     
-    for (int i = 0; i < token_count; i++) {
-        char* pos = strstr(working_data, tokens[i]);
-        if (pos != NULL) {
-            // 跳过令牌文本，指向十六进制值[3](@ref)
-            pos += strlen(tokens[i]);
-            
-            // 将十六进制字符串转换为数值[3](@ref)
-            char hex_str[3] = {pos[0], pos[1],'\0'};
-            *values[i] = (uint8_t)strtol(hex_str, NULL, 16);
-            found_count++;
+    // 在缓冲区中搜索数据包头（假设0xAA 0x55是包头）
+    uint16_t i = 0;
+    for (i = 0; i <= RX_BUFFER_SIZE; i++) {
+        if ((uint8_t)data[i] == 0x0D && (uint8_t)data[i + 1] == 0x0A) {
+            break; // 找到包头
         }
     }
+    // 解析数据（跳过包头2字节）
+    const char* payload_start = &data[i + 2];
+    
+    //joy->mode = (uint8_t)payload_start[1];     // MODE
+    joy->btn1 = (uint8_t)payload_start[4];     // BTN1(每个数据3位）
+    joy->btn2 = (uint8_t)payload_start[7];     // BTN2
+    joy->RJoy_LR = (uint8_t)payload_start[10];  // RJOY_LR
+    joy->RJoy_UD = (uint8_t)payload_start[13];  // RJOY_UD
+    joy->LJoy_LR = (uint8_t)payload_start[16];  // LJOY_LR
+    joy->LJoy_UD = (uint8_t)payload_start[19];  // LJOY_UD
+	
+	
+	
     memset(working_data, 0, RX_BUFFER_SIZE);
-    // 如果成功找到并解析了所有4个值，返回成功[3](@ref)
+    // 如果成功找到并解析了所有4个值，返回成功[3]
     return 0;
 }
+

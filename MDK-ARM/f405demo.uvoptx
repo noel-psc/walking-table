@@ -183,17 +183,17 @@
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>table_state</ItemText>
+          <ItemText>working_data</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>256</ItemText>
+          <ItemText>hex_str[3]</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>1</WinNumber>
-          <ItemText>working_data</ItemText>
+          <ItemText>table_state</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
