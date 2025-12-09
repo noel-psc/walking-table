@@ -23,7 +23,7 @@ void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
   // }
 }
 // 解析摇杆数据函数
-uint8_t parse_joystick_data(const char* data, JOYSTICK_TypeDef* joy) {
+uint8_t parse_joystick_data(const uint8_t* data, JOYSTICK_TypeDef* joy) {
 //    const char* tokens[] = {"RJOY_LR:", "RJOY_UD:", "LJOY_LR:", "LJOY_UD:"};
 //    uint8_t* values[] = {&joy->RJoy_LR, &joy->RJoy_UD, &joy->LJoy_LR, &joy->LJoy_UD};
 //    int token_count = 4;
@@ -44,15 +44,15 @@ uint8_t parse_joystick_data(const char* data, JOYSTICK_TypeDef* joy) {
         }
     }
     // 解析数据（跳过包头2字节）
-    const char* payload_start = &data[i + 2];
+    const uint8_t* payload_start = &data[i + 2];
     
-    //joy->mode = (uint8_t)payload_start[1];     // MODE
-    joy->btn1 = (uint8_t)payload_start[4];     // BTN1(每个数据3位）
-    joy->btn2 = (uint8_t)payload_start[7];     // BTN2
-    joy->RJoy_LR = (uint8_t)payload_start[10];  // RJOY_LR
-    joy->RJoy_UD = (uint8_t)payload_start[13];  // RJOY_UD
-    joy->LJoy_LR = (uint8_t)payload_start[16];  // LJOY_LR
-    joy->LJoy_UD = (uint8_t)payload_start[19];  // LJOY_UD
+    joy->mode = (uint8_t)payload_start[0];     // MODE
+    joy->btn1 = (uint8_t)payload_start[1];     // BTN1）
+    joy->btn2 = (uint8_t)payload_start[2];     // BTN2
+    joy->RJoy_LR = (uint8_t)payload_start[3];  // RJOY_LR
+    joy->RJoy_UD = (uint8_t)payload_start[4];  // RJOY_UD
+    joy->LJoy_LR = (uint8_t)payload_start[5];  // LJOY_LR
+    joy->LJoy_UD = (uint8_t)payload_start[6];  // LJOY_UD
 	
 	
 	

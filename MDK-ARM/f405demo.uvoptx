@@ -195,6 +195,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>table_state</ItemText>
         </Ww>
+        <Ww>
+          <count>8</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>payload_start</ItemText>
+        </Ww>
       </WatchWindow1>
       <Tracepoint>
         <THDelay>0</THDelay>

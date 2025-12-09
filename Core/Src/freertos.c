@@ -180,13 +180,13 @@ void remote_control_entry(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	//HAL_UART_RxHalfCpltCallback(&huart1);  
+  
 	if (uart_rx_complete) {
 
     
         uart_rx_buffer[uart_rx_length] = '\0';
 
-		parse_joystick_data((char*)uart_rx_buffer, &table_state);
+		parse_joystick_data((uint8_t*)uart_rx_buffer, &table_state);
 
         memset(uart_rx_buffer, 0, RX_BUFFER_SIZE);
         uart_rx_length = 0;
