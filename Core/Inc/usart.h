@@ -36,7 +36,7 @@ extern UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN Private defines */
 
-#define RX_BUFFER_SIZE 256 // ����Ԥ�����ݰ���󳤶ȶ���
+#define RX_BUFFER_SIZE 64 // ����Ԥ�����ݰ���󳤶ȶ���
 extern uint8_t uart_rx_buffer[RX_BUFFER_SIZE]; // DMA���ջ�����
 extern volatile uint16_t uart_rx_length;   // ʵ�ʽ��յ������ݳ���
 extern volatile uint8_t uart_rx_complete;  // ������ɱ�־λ

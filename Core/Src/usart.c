@@ -21,7 +21,7 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-#define RX_BUFFER_SIZE 256 // ����Ԥ�����ݰ���󳤶ȶ���
+
 uint8_t uart_rx_buffer[RX_BUFFER_SIZE]; // DMA���ջ�����
 volatile uint16_t uart_rx_length = 0;   // ʵ�ʽ��յ������ݳ���
 volatile uint8_t uart_rx_complete = 0;  // ������ɱ�־λ

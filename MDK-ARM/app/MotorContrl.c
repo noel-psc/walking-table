@@ -10,8 +10,8 @@ void Motor_contrl(JOYSTICK_TypeDef JOYSTICK)
 {  
    Start_PWM(&htim3);
    Start_PWM(&htim5);
-   Set_PWM(&htim3,1500,1500);
-   Set_PWM(&htim5,fof_update((JOYSTICK.RJoy_LR-80)*50),fof_update((JOYSTICK.RJoy_LR-80)*50));
+   Set_PWM(&htim3,0,0);
+   Set_PWM(&htim5,fof_update((JOYSTICK.RJoy_LR-0x80)*50),fof_update(-(JOYSTICK.RJoy_UD-0x7f)*50));
 }
 
 void Set_PWM(TIM_HandleTypeDef *htim,int motor_left,int motor_right)
