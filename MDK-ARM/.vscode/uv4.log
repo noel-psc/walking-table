@@ -1,4 +1,4 @@
 Load "f405demo\\f405demo.axf" 
-Internal DLL Error
-Error: Flash Download failed  -  Target DLL has been cancelled
-Flash Load finished at 17:47:42
+Erase Failed!RDDI-DAP Error
+Error: Flash Download failed  -  "Cortex-M4"
+Flash Load finished at 16:38:11

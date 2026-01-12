@@ -9,6 +9,8 @@ const float R = 0.34;
 // 45°角的正弦余弦值（sqrt(2)/2）
 const float sin45 = 0.707f;  // sqrt(2)/2
 const float cos45 = 0.707f;  // sqrt(2)/2
+const float cos60 = 0.5f;    // cos(60°)=0.5
+const float sin60 = 0.866f;  // sin(60°)=sqrt(3)/2
     
 
 // 为4个轮子声明滤波器实例
@@ -28,6 +30,7 @@ void Motor_init(void)
 {
     Stop_PWM(&htim3);
     Stop_PWM(&htim5);
+	
     Start_PWM(&htim3);
     Start_PWM(&htim5);
     //Setup_Filters();
@@ -156,13 +159,13 @@ float fof_update(Single_Motor* input) {
  */
 void omni_wheel_inverse_kinematics(Velocity_Input input, Chassic_State* chassis_) {
     // 全向轮运动学逆解公式[4,6](@ref)输出 chassis_->motors[i].targetspeed 的单位是 1/s（即线速度/轮半径 → 角速度，rad/s），因为公式最后除以 wheel_radius。
-
+    //速度=编码器读数（利用中断进行一个周期读数）*读取频率*/倍频数/减速比/编码器精度*轮子的周长。然后就可以根据输入的速度来反向计算出编码器的值（运动学逆运算）。
     // 考虑轮子安装角度为45°的情况
-    chassis_->motors[0].targetspeed = ( input.vx * cos45 - input.vy * cos45 - input.omega * R) / chassis_params.wheel_radius*30;  // 前左轮
-    chassis_->motors[1].targetspeed = (-input.vx * cos45 - input.vy * cos45 - input.omega * R) / chassis_params.wheel_radius*30;  // 前右轮
-    chassis_->motors[2].targetspeed = ( input.vx * cos45 + input.vy * cos45 - input.omega * R) / chassis_params.wheel_radius*30;  // 后左轮
-    chassis_->motors[3].targetspeed = (-input.vx * cos45 + input.vy * cos45 - input.omega * R) / chassis_params.wheel_radius*30;  // 后右轮
-    
+    chassis_->motors[0].targetspeed = ( input.vx * sin60 - input.vy * cos60 - input.omega * R) / chassis_params.wheel_radius;  // 前左轮
+    chassis_->motors[1].targetspeed = (-input.vx * sin60 - input.vy * cos60 - input.omega * R) / chassis_params.wheel_radius;  // 前右轮
+    chassis_->motors[2].targetspeed = ( input.vx * sin60 + input.vy * cos60 - input.omega * R) / chassis_params.wheel_radius;  // 后左轮
+    chassis_->motors[3].targetspeed = (-input.vx * sin60 + input.vy * cos60 - input.omega * R) / chassis_params.wheel_radius;  // 后右轮
+
     // 注：如果轮子安装角度不同，需要调整上述公式中的角度参数[7](@ref)
     
 }
