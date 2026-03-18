@@ -4,7 +4,7 @@
 const float k_=0.1;  // Smoothing factor (0 < k < 1)
 
     // 计算旋转半径（考虑长宽比影响）
-const float R = 0.34;
+const float R = 0.34*3;
 
 // 45°角的正弦余弦值（sqrt(2)/2）
 const float sin45 = 0.707f;  // sqrt(2)/2
