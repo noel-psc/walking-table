@@ -51,8 +51,7 @@ void Motor_contrl(JOYSTICK_TypeDef JOYSTICK)
         v_input.omega = 0;
     }
     omni_wheel_inverse_kinematics(v_input, &chassis);   
-Set_PWM(&htim3,fof_update(&chassis.motors[0]),fof_update(&chassis.motors[1]));
-
+    Set_PWM(&htim3,fof_update(&chassis.motors[0]),fof_update(&chassis.motors[1]));
     Set_PWM(&htim5,fof_update(&chassis.motors[2]),fof_update(&chassis.motors[3])); 
     HAL_IWDG_Refresh(&soft_reset); // 使用生成的句柄变量进行喂狗
 //	JOYSTICK.RJoy_LR=0x80;

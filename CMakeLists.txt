@@ -11,7 +11,9 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
-
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 # Define the build type
 if(NOT CMAKE_BUILD_TYPE)
@@ -29,7 +31,7 @@ project(${CMAKE_PROJECT_NAME})
 message("Build type: " ${CMAKE_BUILD_TYPE})
 
 # Enable CMake support for ASM and C languages
-enable_language(C ASM)
+enable_language(C CXX ASM)
 
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
@@ -39,6 +41,7 @@ add_subdirectory(cmake/stm32cubemx)
 
 file(GLOB_RECURSE USER_SOURCES
     "MDK-ARM/app/*.c"
+    "src/**"
 )
 
 # Link directories setup
