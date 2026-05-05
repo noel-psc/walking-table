@@ -3,7 +3,7 @@
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
   /* 首先判断是哪个串口触发的中断，这在有多个串口时非常必要 */
-  if (huart->Instance == USART1) // 假设是USART1
+  if (huart->Instance == USART3)
   {
     /* 这里是您的应用逻辑实现区 */
     // 1. 此时，DMA已经将数据填充至接收缓冲区的前半部分
