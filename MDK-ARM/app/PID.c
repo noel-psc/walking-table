@@ -79,6 +79,7 @@ void PID_Reset(PID_Controller *pid)
 
 	pid->err = 0.0f;
 	pid->err_last = 0.0f;
+	pid->err_prev = 0.0f;
 
 	pid->p_out = 0.0f;
 	pid->i_out = 0.0f;
@@ -86,14 +87,14 @@ void PID_Reset(PID_Controller *pid)
 	pid->out = 0.0f;
 }
 
-/* 统一入口：当前仅保留位置式PID */
+/* 统一入口：使用增量式PID */
 float PID_Calc(PID_Controller *pid, float set, float fdb)
 {
 	if (pid == 0) {
 		return 0.0f;
 	}
 
-	return PID_CalcPosition(pid, set, fdb);
+	return PID_CalcIncremental(pid, set, fdb);
 }
 
 /*
@@ -161,33 +162,39 @@ int16_t PID_SpeedMpsToPwm(float speed_mps, const PID_SpeedMap *map)
 }
 
 /*
- * 位置式PID：
- * out = Kp*e + Ki*Σe*dt + Kd*(e[k]-e[k-1])/dt
+ * 增量式PID：
+ * delta = Kp*(e[k]-e[k-1]) + Ki*e[k]*dt + Kd*(e[k]-2e[k-1]+e[k-2])/dt
+ * out = out + delta
  */
-float PID_CalcPosition(PID_Controller *pid, float set, float fdb)
+float PID_CalcIncremental(PID_Controller *pid, float set, float fdb)
 {
+	float delta;
+	float i_term;
+	float dt;
+
 	if (pid == 0) {
 		return 0.0f;
 	}
+
+	dt = (pid->dt > 0.0f) ? pid->dt : 0.001f;
 
 	pid->set = set;
 	pid->fdb = fdb;
 
 	pid->err = pid->set - pid->fdb;
 
-	pid->p_out = pid->kp * pid->err;
+	pid->p_out = pid->kp * (pid->err - pid->err_last);
 
-	/* 积分累加并做抗饱和限幅 */
-	pid->i_out += pid->ki * pid->err * pid->dt;
-	pid->i_out = pid_clampf(pid->i_out, pid->max_i_out);
+	/* 积分项在增量式中作为当前误差的增量贡献 */
+	i_term = pid->ki * pid->err * dt;
+	pid->i_out = pid_clampf(i_term, pid->max_i_out);
 
-	/* 微分项用误差差分近似 */
-	pid->d_out = pid->kd * (pid->err - pid->err_last) / pid->dt;
+	pid->d_out = pid->kd * (pid->err - 2.0f * pid->err_last + pid->err_prev) / dt;
 
-	pid->out = pid->p_out + pid->i_out + pid->d_out;
-	/* 总输出限幅，匹配执行器能力 */
-	pid->out = pid_clampf(pid->out, pid->max_out);
+	delta = pid->p_out + pid->i_out + pid->d_out;
+	pid->out = pid_clampf(pid->out + delta, pid->max_out);
 
+	pid->err_prev = pid->err_last;
 	pid->err_last = pid->err;
 
 	return pid->out;

@@ -22,10 +22,11 @@ typedef struct {
 
 	float err;       /* 本次误差 e[k] */
 	float err_last;  /* 上次误差 e[k-1] */
+	float err_prev;  /* 上上次误差 e[k-2] */
 
-	float p_out;  /* 比例输出 */
-	float i_out;  /* 积分输出 */
-	float d_out;  /* 微分输出 */
+	float p_out;  /* 比例增量 */
+	float i_out;  /* 积分增量 */
+	float d_out;  /* 微分增量 */
 	float out;    /* 最终输出 */
 } PID_Controller;
 
@@ -60,7 +61,7 @@ void PID_Init(PID_Controller *pid,
 /* 清空历史误差和输出状态 */
 void PID_Reset(PID_Controller *pid);
 
-/* 根据当前模式计算PID输出 */
+/* 根据当前模式计算PID输出（增量式） */
 float PID_Calc(PID_Controller *pid, float set, float fdb);
 
 /* 速度环封装：形参单位为米每秒（m/s），要求set/fdb都已是线速度 */
@@ -78,8 +79,8 @@ float PID_WheelRadpsToLinearMps(float wheel_radps, float wheel_radius_m);
  */
 int16_t PID_SpeedMpsToPwm(float speed_mps, const PID_SpeedMap *map);
 
-/* 按位置式PID计算输出 */
-float PID_CalcPosition(PID_Controller *pid, float set, float fdb);
+/* 按增量式PID计算输出 */
+float PID_CalcIncremental(PID_Controller *pid, float set, float fdb);
 
 /* 运行时更新PID参数 */
 void PID_SetTunings(PID_Controller *pid, float kp, float ki, float kd);

@@ -1,5 +1,9 @@
 #include "MotorContrl.h"
 #include "utils.h"
+#include "encoder_speed.h"
+#include "speed_loop.h"
+#include "tim.h"
+#include "telemetry_uart4.h"
 
 const float k_=0.1;  // Smoothing factor (0 < k < 1)
 
@@ -21,6 +25,48 @@ const Chassis_Params chassis_params={0.3f,0.15f,0.05f};//初始化底盘参数 �
 
 Velocity_Input v_input;// 速度输入结构体实例
 
+static const float k_encoder_ppr = 13.0f;
+static const float k_gear_ratio = 30.0f;
+static const float k_control_dt_s = 0.001f;
+static const float k_counts_per_rev = (k_encoder_ppr * 4.0f * k_gear_ratio);
+static const float k_target_speed_scale = 1.0f;
+static const float k_speed_kp = 2.0f;
+static const float k_speed_ki = 2.0f;
+static const float k_speed_kd = 2.0f;
+static const float k_speed_max_out = 7200.0f;
+static const float k_speed_max_i_out = 7200.0f;
+
+static EncoderSpeedState encoder_states[MOTORNUMBER];
+static SpeedLoop speed_loops[MOTORNUMBER];
+
+static void Motor_InitEncoders(void)
+{
+    HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
+    HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
+    HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
+    HAL_TIM_Encoder_Start(&htim8, TIM_CHANNEL_ALL);
+
+    EncoderSpeed_Init(&encoder_states[0], &htim2);
+    EncoderSpeed_Init(&encoder_states[1], &htim1);
+    EncoderSpeed_Init(&encoder_states[2], &htim8);
+    EncoderSpeed_Init(&encoder_states[3], &htim4);
+}
+
+static void Motor_InitSpeedLoops(void)
+{
+    uint32_t i;
+
+    for (i = 0; i < MOTORNUMBER; i++) {
+        SpeedLoop_Init(&speed_loops[i],
+                       k_speed_kp,
+                       k_speed_ki,
+                       k_speed_kd,
+                       k_control_dt_s,
+                       k_speed_max_out,
+                       k_speed_max_i_out);
+    }
+}
+
 /*************************************************************
 函数功能：PWM赋值
 入口参数：motor_left:左电机PWM值，motor_right:右电机PWM值
@@ -33,15 +79,22 @@ void Motor_init(void)
 	
     Start_PWM(&htim3);
     Start_PWM(&htim5);
+    Motor_InitEncoders();
+    Motor_InitSpeedLoops();
+    TelemetryUart4_Init();
     //Setup_Filters();
 
 }
 
-void Motor_contrl(JOYSTICK_TypeDef JOYSTICK)
-{  if (JOYSTICK.mode==0x73){
-    v_input.vx = JOYSTICK.RJoy_LR-0x80;
-    v_input.vy = JOYSTICK.RJoy_UD-0x7f;
-    v_input.omega = JOYSTICK.LJoy_LR-0x80;//第一步处理
+void Motor_contrl(JOYSTICK_TypeDef joystick)
+{
+    float motor_pwm[MOTORNUMBER];
+	uint32_t i;
+
+	if (joystick.mode==0x73){
+    v_input.vx = joystick.RJoy_LR-0x80;
+    v_input.vy = joystick.RJoy_UD-0x7f;
+    v_input.omega = joystick.LJoy_LR-0x80;//第一步处理
     
     
     }else
@@ -50,9 +103,41 @@ void Motor_contrl(JOYSTICK_TypeDef JOYSTICK)
         v_input.vy = 0;
         v_input.omega = 0;
     }
-    omni_wheel_inverse_kinematics(v_input, &chassis);   
-    Set_PWM(&htim3,fof_update(&chassis.motors[0]),fof_update(&chassis.motors[1]));
-    Set_PWM(&htim5,fof_update(&chassis.motors[2]),fof_update(&chassis.motors[3])); 
+    omni_wheel_inverse_kinematics(v_input, &chassis);
+
+    for (i = 0; i < MOTORNUMBER; i++) {
+        EncoderSpeed_Update(&encoder_states[i], k_control_dt_s, k_counts_per_rev);
+        chassis.motors[i].speed = EncoderSpeed_GetRadps(&encoder_states[i]);
+        motor_pwm[i] = fof_update(&chassis.motors[i]);
+    }
+
+    Set_PWM(&htim3, (int)motor_pwm[0], (int)motor_pwm[1]);
+    Set_PWM(&htim5, (int)motor_pwm[2], (int)motor_pwm[3]);
+
+    {
+        static uint32_t debug_div = 0;
+        static uint32_t debug_idx = 0;
+        uint32_t cnt;
+
+        debug_div++;
+        if (debug_div >= 100U) {
+            debug_div = 0;
+
+            if (debug_idx == 0U) {
+                cnt = __HAL_TIM_GET_COUNTER(&htim2);
+            } else if (debug_idx == 1U) {
+                cnt = __HAL_TIM_GET_COUNTER(&htim1);
+            } else if (debug_idx == 2U) {
+                cnt = __HAL_TIM_GET_COUNTER(&htim8);
+            } else {
+                cnt = __HAL_TIM_GET_COUNTER(&htim4);
+            }
+
+            TelemetryUart4_SendDouble((double)cnt);
+            debug_idx = (debug_idx + 1U) % 4U;
+        }
+    }
+
     HAL_IWDG_Refresh(&soft_reset); // 使用生成的句柄变量进行喂狗
 //	JOYSTICK.RJoy_LR=0x80;
 //    JOYSTICK.RJoy_UD=0x7f;
@@ -60,34 +145,34 @@ void Motor_contrl(JOYSTICK_TypeDef JOYSTICK)
 	
 }
 void Set_PWM(TIM_HandleTypeDef *htim,int motor_left,int motor_right)
-{	motor_left = (motor_left > 7200) ? 7200 : motor_left;
-   motor_left = (motor_left < -7200) ? -7200 : motor_left;
-   motor_right = (motor_right > 7200) ? 7200 : motor_right;
-   motor_right = (motor_right < -7200) ? -7200 : motor_right;
+{
+    motor_left = (motor_left > 7200) ? 7200 : motor_left;
+    motor_left = (motor_left < -7200) ? -7200 : motor_left;
+    motor_right = (motor_right > 7200) ? 7200 : motor_right;
+    motor_right = (motor_right < -7200) ? -7200 : motor_right;
 
-   if(motor_left>0)   
-   {   
-	   __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1,7200);
-	   __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2,7200-motor_left);
-   }
-   else
-   {
-	   __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1,7200+motor_left);
-	   __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2,7200);
-   }
-   if(motor_right>0)
-   {
-	   __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3,7200);
-	   __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_4,7200-motor_right);
-   }
-   else
-   {
-	   __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3,7200+motor_right);
-	   __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_4,7200);
-   }
-	
-	
+    if(motor_left > 0)   
+    {   
+        __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1,7200);
+	    __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2,7200-motor_left);
+    }
+    else
+    {
+	    __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1,7200+motor_left);
+	    __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2,7200);
+    }
+    if(motor_right>0)
+    {
+	    __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3,7200);
+	    __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_4,7200-motor_right);
+    }
+    else
+    {
+        __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3,7200+motor_right);
+        __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_4,7200);
+    }
 }
+
 void Stop_PWM(TIM_HandleTypeDef *htim)
 {
    HAL_TIM_PWM_Stop(htim, TIM_CHANNEL_1);
@@ -181,5 +266,3 @@ void omni_wheel_inverse_kinematics(Velocity_Input input, Chassic_State* chassis_
     // 注：如果轮子安装角度不同，需要调整上述公式中的角度参数[7](@ref)
     
 }
-
-

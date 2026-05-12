@@ -41,7 +41,7 @@ add_subdirectory(cmake/stm32cubemx)
 
 file(GLOB_RECURSE USER_SOURCES
     "MDK-ARM/app/*.c"
-    "src/**"
+    "src/*.c"
 )
 
 # Link directories setup

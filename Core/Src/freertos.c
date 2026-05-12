@@ -161,8 +161,8 @@ void motor_move_entry(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	Motor_contrl(table_state);
-    osDelay(1);
+	  Motor_contrl(table_state);
+    osDelay(10);
   }
   /* USER CODE END motor_move_entry */
 }

@@ -68,7 +68,7 @@ float fof_update(Single_Motor* input);
 
 static JOYSTICK_TypeDef table_state;
 void Set_PWM(TIM_HandleTypeDef *htim,int motor_left,int motor_right);
-void Motor_contrl(JOYSTICK_TypeDef JOYSTICK);
+void Motor_contrl(JOYSTICK_TypeDef joystick);
 void Stop_PWM(TIM_HandleTypeDef *htim);
 void Start_PWM(TIM_HandleTypeDef *htim);
 void Motor_init(void);
