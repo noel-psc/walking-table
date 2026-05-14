@@ -5,6 +5,8 @@
 #include "tim.h"
 #include "telemetry_uart4.h"
 
+JOYSTICK_TypeDef table_state;  // 全局摇杆状态变量
+
 const float k_=0.1;  // Smoothing factor (0 < k < 1)
 
     // 计算旋转半径（考虑长宽比影响）
@@ -81,7 +83,6 @@ void Motor_init(void)
     Start_PWM(&htim5);
     Motor_InitEncoders();
     Motor_InitSpeedLoops();
-    TelemetryUart4_Init();
     //Setup_Filters();
 
 }
@@ -113,30 +114,6 @@ void Motor_contrl(JOYSTICK_TypeDef joystick)
 
     Set_PWM(&htim3, (int)motor_pwm[0], (int)motor_pwm[1]);
     Set_PWM(&htim5, (int)motor_pwm[2], (int)motor_pwm[3]);
-
-    {
-        static uint32_t debug_div = 0;
-        static uint32_t debug_idx = 0;
-        uint32_t cnt;
-
-        debug_div++;
-        if (debug_div >= 100U) {
-            debug_div = 0;
-
-            if (debug_idx == 0U) {
-                cnt = __HAL_TIM_GET_COUNTER(&htim2);
-            } else if (debug_idx == 1U) {
-                cnt = __HAL_TIM_GET_COUNTER(&htim1);
-            } else if (debug_idx == 2U) {
-                cnt = __HAL_TIM_GET_COUNTER(&htim8);
-            } else {
-                cnt = __HAL_TIM_GET_COUNTER(&htim4);
-            }
-
-            TelemetryUart4_SendDouble((double)cnt);
-            debug_idx = (debug_idx + 1U) % 4U;
-        }
-    }
 
     HAL_IWDG_Refresh(&soft_reset); // 使用生成的句柄变量进行喂狗
 //	JOYSTICK.RJoy_LR=0x80;

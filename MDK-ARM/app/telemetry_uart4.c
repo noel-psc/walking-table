@@ -1,23 +1,11 @@
 #include "telemetry_uart4.h"
-
 #include "usart.h"
 #include <string.h>
+#include <stdio.h>
 
 void TelemetryUart4_Init(void)
 {
 	(void)huart4;
-}
-
-void TelemetryUart4_Tick1ms(void)
-{
-	static uint32_t tick = 0;
-	static const char msg[] = "hello\r\n";
-
-	tick++;
-	if (tick >= 100U) {
-		tick = 0;
-		HAL_UART_Transmit(&huart4, (uint8_t *)msg, (uint16_t)strlen(msg), 100);
-	}
 }
 
 void TelemetryUart4_SendDouble(double value)
@@ -60,4 +48,20 @@ void TelemetryUart4_SendDouble(double value)
 	buf[idx++] = '\n';
 
 	HAL_UART_Transmit(&huart4, (uint8_t *)buf, (uint16_t)idx, 100);
+}
+
+void TelemetryUart4_SendInt(uint16_t value)
+{
+	char buf[16] = {0};
+	snprintf(buf, sizeof(buf), "%u", value);
+	HAL_UART_Transmit(&huart4, (uint8_t *)buf, (uint16_t)strlen(buf), HAL_MAX_DELAY);
+}
+
+void TelemetryUart4_SendString(const char *str)
+{
+	if (str == NULL) {
+		return;
+	}
+
+	HAL_UART_Transmit(&huart4, (uint8_t *)str, (uint16_t)strlen(str), HAL_MAX_DELAY);
 }

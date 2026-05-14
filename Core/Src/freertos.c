@@ -30,6 +30,8 @@
 #include <string.h>    // Ϊ memset, strncpy, strlen �Ⱥ���
 #include <stdlib.h>    // Ϊ strtol ����
 #include "ax_ps2.h"    // Ϊ parse_joystick_data ����������
+#include "telemetry_uart4.h"
+#include "tim.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -72,6 +74,13 @@ const osThreadAttr_t remote_control_attributes = {
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityRealtime1,
 };
+/* Definitions for uart4_test */
+osThreadId_t uart4_testHandle;
+const osThreadAttr_t uart4_test_attributes = {
+  .name = "uart4_test",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -81,6 +90,7 @@ const osThreadAttr_t remote_control_attributes = {
 void StartDefaultTask(void *argument);
 void motor_move_entry(void *argument);
 void remote_control_entry(void *argument);
+void uart4_test_entry(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -119,6 +129,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of remote_control */
   remote_controlHandle = osThreadNew(remote_control_entry, NULL, &remote_control_attributes);
+
+  /* creation of uart4_test */
+  uart4_testHandle = osThreadNew(uart4_test_entry, NULL, &uart4_test_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -195,6 +208,40 @@ void remote_control_entry(void *argument)
     osDelay(1);
   }
   /* USER CODE END remote_control_entry */
+}
+
+/* USER CODE BEGIN Header_uart4_test_entry */
+/**
+* @brief Function implementing the uart4_test thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_uart4_test_entry */
+void uart4_test_entry(void *argument)
+{
+  /* USER CODE BEGIN uart4_test_entry */
+  TelemetryUart4_Init();
+  extern JOYSTICK_TypeDef table_state;  // 声明全局摇杆状态变量
+  for(;;)
+  {
+    TelemetryUart4_SendString("mode:");
+    TelemetryUart4_SendInt(table_state.mode);
+    TelemetryUart4_SendString(" ");
+    TelemetryUart4_SendString("debug:");
+    TelemetryUart4_SendInt(table_state.debug);
+    TelemetryUart4_SendString(" ");
+    TelemetryUart4_SendString("RJoy_UD:");
+    TelemetryUart4_SendInt(table_state.RJoy_UD);
+    TelemetryUart4_SendString(" ");
+    TelemetryUart4_SendString("RJoy_LR:");
+    TelemetryUart4_SendInt(table_state.RJoy_LR);
+    TelemetryUart4_SendString(" ");
+    TelemetryUart4_SendString("LJoy_LR:");
+    TelemetryUart4_SendInt(table_state.LJoy_LR);
+    TelemetryUart4_SendString(" ");
+    osDelay(500);
+  }
+  /* USER CODE END uart4_test_entry */
 }
 
 /* Private application code --------------------------------------------------*/

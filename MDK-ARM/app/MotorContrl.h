@@ -9,10 +9,16 @@
 
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim5;
+extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim2;
+extern TIM_HandleTypeDef htim4;
+extern TIM_HandleTypeDef htim8;
 extern const float k_;
 typedef struct			 				
 {
   uint8_t mode;		    /* 手柄的工作模式 */
+
+  uint8_t debug;        /* 0: 正常模式，1: 调试模式 */
 
   uint8_t btn1;         /* B0:SLCT B1:JR  B0:JL B3:STRT B4:UP B5:R B6:DOWN  B7:L   */
 
@@ -27,6 +33,8 @@ typedef struct
   uint8_t LJoy_UD;      /* 左边摇杆  0x00 = 上    0xff = 下   */
 	
 }JOYSTICK_TypeDef;
+
+extern JOYSTICK_TypeDef table_state;
 
 // 单个电机结构体定义
 typedef struct {
@@ -66,7 +74,6 @@ extern const float k_;      // Smoothing factor (0 < k < 1)
 float fof_update(Single_Motor* input);
 
 
-static JOYSTICK_TypeDef table_state;
 void Set_PWM(TIM_HandleTypeDef *htim,int motor_left,int motor_right);
 void Motor_contrl(JOYSTICK_TypeDef joystick);
 void Stop_PWM(TIM_HandleTypeDef *htim);
