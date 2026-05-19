@@ -33,7 +33,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-extern JOYSTICK_TypeDef table_state;  //�ֱ���ֵ�ṹ��
+extern JOYSTICK_TypeDef joystick_state;  //�ֱ���ֵ�ṹ��
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -72,7 +72,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	table_state.debug = 0; // 0: 正常模式，1: 调试模式
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/

@@ -1,5 +1,7 @@
 #include "PID.h"
 
+#ifdef __PID_ON
+
 #define PID_EPSILON_F (1e-6f)
 
 /* 取绝对值，用于统一处理正负限幅输入 */
@@ -225,3 +227,4 @@ void PID_SetLimits(PID_Controller *pid, float max_out, float max_i_out)
 	pid->out = pid_clampf(pid->out, pid->max_out);
 }
 
+#endif

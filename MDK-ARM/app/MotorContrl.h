@@ -18,8 +18,6 @@ typedef struct
 {
   uint8_t mode;		    /* 手柄的工作模式 */
 
-  uint8_t debug;        /* 0: 正常模式，1: 调试模式 */
-
   uint8_t btn1;         /* B0:SLCT B1:JR  B0:JL B3:STRT B4:UP B5:R B6:DOWN  B7:L   */
 
   uint8_t btn2;         /* B0:L2   B1:R2  B2:L1 B3:R1   B4:Y  B5:B B6:A     B7:X */
@@ -34,7 +32,7 @@ typedef struct
 	
 }JOYSTICK_TypeDef;
 
-extern JOYSTICK_TypeDef table_state;
+extern JOYSTICK_TypeDef joystick_state;
 
 // 单个电机结构体定义
 typedef struct {
@@ -55,8 +53,16 @@ typedef struct {
     float wheel_radius;// 轮子半径（单位：米）
 } Chassis_Params;
 
+// 输入来源
+typedef enum {
+    INPUT_SOURCE_NONE = 0,
+    INPUT_SOURCE_JOYSTICK = 1,
+    INPUT_SOURCE_CMD_VEL = 2,
+} Input_Source;
+
 // 速度输入结构体
 typedef struct {
+    Input_Source source;
     float vx;          // 前后速度（m/s，前进为正）
     float vy;          // 左右速度（m/s，左移为正）
     float omega;       // 旋转速度（rad/s，逆时针为正）
@@ -75,7 +81,9 @@ float fof_update(Single_Motor* input);
 
 
 void Set_PWM(TIM_HandleTypeDef *htim,int motor_left,int motor_right);
+void Motor_apply_input(Velocity_Input input);
 void Motor_contrl(JOYSTICK_TypeDef joystick);
+void Joystick_to_input(const JOYSTICK_TypeDef* joystick, Velocity_Input* input);
 void Stop_PWM(TIM_HandleTypeDef *htim);
 void Start_PWM(TIM_HandleTypeDef *htim);
 void Motor_init(void);

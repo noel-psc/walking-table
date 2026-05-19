@@ -1,5 +1,7 @@
 #include "encoder_speed.h"
 
+#ifdef __ENCODER_SPEED_ON
+
 #define ENCODER_TWO_PI (6.283185307179586f)
 
 static int32_t encoder_delta(TIM_HandleTypeDef *htim, uint32_t now, uint32_t last)
@@ -60,3 +62,5 @@ float EncoderSpeed_GetRadps(const EncoderSpeedState *state)
 
 	return state->radps;
 }
+
+#endif

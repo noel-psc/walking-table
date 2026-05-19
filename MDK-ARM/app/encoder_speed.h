@@ -1,6 +1,7 @@
 #ifndef ENCODER_SPEED_H
 #define ENCODER_SPEED_H
 
+#define __ENCODER_SPEED_ON
 #include "stm32f4xx_hal.h"
 
 #ifdef __cplusplus

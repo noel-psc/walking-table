@@ -1,6 +1,8 @@
 #ifndef SPEED_LOOP_H
 #define SPEED_LOOP_H
 
+#define __SPEED_LOOP_ON
+
 #include "PID.h"
 
 #ifdef __cplusplus

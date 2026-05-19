@@ -1,5 +1,7 @@
 #include "speed_loop.h"
 
+#ifdef __SPEED_LOOP_ON
+
 void SpeedLoop_Init(SpeedLoop *loop,
 				   float kp,
 				   float ki,
@@ -32,3 +34,5 @@ float SpeedLoop_Update(SpeedLoop *loop, float target_radps, float feedback_radps
 
 	return PID_CalcIncremental(&loop->pid, target_radps, feedback_radps);
 }
+
+#endif

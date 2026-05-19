@@ -174,7 +174,9 @@ void motor_move_entry(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  Motor_contrl(table_state);
+    if (v_input.source != INPUT_SOURCE_NONE) {
+      Motor_apply_input(v_input);
+    }
     osDelay(10);
   }
   /* USER CODE END motor_move_entry */
@@ -195,16 +197,34 @@ void remote_control_entry(void *argument)
   {
   
 	if (uart_rx_complete) {
+    uint16_t i = 0;
+    uint8_t mode = 0;
 
-    
-        uart_rx_buffer[uart_rx_length] = '\0';
-
-		parse_joystick_data((uint8_t*)uart_rx_buffer, &table_state);
-
-        memset(uart_rx_buffer, 0, RX_BUFFER_SIZE);
-        uart_rx_length = 0;
-		uart_rx_complete = 0;
+    for (i = 0; i < RX_BUFFER_SIZE - 1; i++) {
+      if ((uint8_t)uart_rx_buffer[i] == 0xAA && (uint8_t)uart_rx_buffer[i + 1] == 0x55) {
+        if (i + 2 < RX_BUFFER_SIZE) {
+          mode = (uint8_t)uart_rx_buffer[i + 2];
+        }
+        break;
+      }
     }
+
+    if (mode == 0x73) {
+      if (parse_joystick_data((uint8_t*)uart_rx_buffer, &joystick_state) == 0) {
+        Joystick_to_input(&joystick_state, &v_input);
+      } else {
+        v_input.source = INPUT_SOURCE_NONE;
+      }
+    } else {
+      if (parse_cmd_vel_data((uint8_t*)uart_rx_buffer, &v_input) != 0) {
+        v_input.source = INPUT_SOURCE_NONE;
+      }
+    }
+
+    memset(uart_rx_buffer, 0, RX_BUFFER_SIZE);
+    uart_rx_length = 0;
+		uart_rx_complete = 0;
+  }
     osDelay(1);
   }
   /* USER CODE END remote_control_entry */
@@ -221,25 +241,25 @@ void uart4_test_entry(void *argument)
 {
   /* USER CODE BEGIN uart4_test_entry */
   TelemetryUart4_Init();
-  extern JOYSTICK_TypeDef table_state;  // 声明全局摇杆状态变量
+  extern JOYSTICK_TypeDef joystick_state;  // 声明全局摇杆状态变量
   for(;;)
-  {
-    TelemetryUart4_SendString("mode:");
-    TelemetryUart4_SendInt(table_state.mode);
+  {/*
+  TelemetryUart4_SendString("mode:");
+    TelemetryUart4_SendInt(joystick_state.mode);
     TelemetryUart4_SendString(" ");
     TelemetryUart4_SendString("debug:");
-    TelemetryUart4_SendInt(table_state.debug);
+    TelemetryUart4_SendInt(joystick_state.debug);
     TelemetryUart4_SendString(" ");
     TelemetryUart4_SendString("RJoy_UD:");
-    TelemetryUart4_SendInt(table_state.RJoy_UD);
+    TelemetryUart4_SendInt(joystick_state.RJoy_UD);
     TelemetryUart4_SendString(" ");
     TelemetryUart4_SendString("RJoy_LR:");
-    TelemetryUart4_SendInt(table_state.RJoy_LR);
+    TelemetryUart4_SendInt(joystick_state.RJoy_LR);
     TelemetryUart4_SendString(" ");
     TelemetryUart4_SendString("LJoy_LR:");
-    TelemetryUart4_SendInt(table_state.LJoy_LR);
+    TelemetryUart4_SendInt(joystick_state.LJoy_LR);
     TelemetryUart4_SendString(" ");
-    osDelay(500);
+    osDelay(500);*/
   }
   /* USER CODE END uart4_test_entry */
 }

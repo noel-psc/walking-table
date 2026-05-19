@@ -1,6 +1,8 @@
 #ifndef __PID_H
 #define __PID_H
 
+#define __PID_ON
+
 #include <stdint.h>
 
 #ifdef __cplusplus

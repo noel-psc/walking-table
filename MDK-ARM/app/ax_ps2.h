@@ -7,8 +7,9 @@
 #include "MotorContrl.h"
 #include <string.h>  // 为 strncpy, strstr, strlen
 #include <stdlib.h>  // 为 strtol
-extern  JOYSTICK_TypeDef table_state;
+extern JOYSTICK_TypeDef joystick_state;
 uint8_t parse_joystick_data(const uint8_t* data, JOYSTICK_TypeDef* joy);
+uint8_t parse_cmd_vel_data(const uint8_t* data, Velocity_Input* input);
 typedef struct {
     uint8_t mode;        // MODE: 工作模式
     uint8_t btn1;        // BTN1: 按钮1状态
