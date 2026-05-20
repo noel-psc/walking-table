@@ -1,8 +1,10 @@
 #ifndef ENCODER_SPEED_H
 #define ENCODER_SPEED_H
 
-#define __ENCODER_SPEED_ON
+#include "main.h"
 #include "stm32f4xx_hal.h"
+
+#ifdef __ENCODER_SPEED_ON
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,6 +22,8 @@ float EncoderSpeed_GetRadps(const EncoderSpeedState *state);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

@@ -1,9 +1,10 @@
 #ifndef __PID_H
 #define __PID_H
 
-#define __PID_ON
-
+#include "main.h"
 #include <stdint.h>
+
+#ifdef __PID_ON
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,6 +93,8 @@ void PID_SetLimits(PID_Controller *pid, float max_out, float max_i_out);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

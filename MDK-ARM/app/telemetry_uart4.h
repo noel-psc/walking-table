@@ -1,7 +1,10 @@
 #ifndef TELEMETRY_UART4_H
 #define TELEMETRY_UART4_H
 
+#include "main.h"
 #include <stdint.h>
+
+#ifdef __TELEMETRY_UART4_ON
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,6 +18,8 @@ void TelemetryUart4_SendString(const char *str);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

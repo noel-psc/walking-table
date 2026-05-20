@@ -1,9 +1,10 @@
 #ifndef SPEED_LOOP_H
 #define SPEED_LOOP_H
 
-#define __SPEED_LOOP_ON
-
+#include "main.h"
 #include "PID.h"
+
+#ifdef __SPEED_LOOP_ON
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +27,8 @@ float SpeedLoop_Update(SpeedLoop *loop, float target_radps, float feedback_radps
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

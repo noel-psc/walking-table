@@ -31,7 +31,10 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#define __TELEMETRY_UART4_ON
+// #define __ENCODER_SPEED_ON
+// #define __PID_ON
+// #define __SPEED_LOOP_ON
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
