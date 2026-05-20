@@ -32,6 +32,7 @@
 #include "ax_ps2.h"    // Ϊ parse_joystick_data ����������
 #include "telemetry_uart4.h"
 #include "tim.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -240,27 +241,33 @@ void remote_control_entry(void *argument)
 void uart4_test_entry(void *argument)
 {
   /* USER CODE BEGIN uart4_test_entry */
+  #ifdef __TELEMETRY_UART4_ON
   TelemetryUart4_Init();
   extern JOYSTICK_TypeDef joystick_state;  // 声明全局摇杆状态变量
+  extern Velocity_Input v_input;
+
+  char buf[16];
   for(;;)
-  {/*
-  TelemetryUart4_SendString("mode:");
-    TelemetryUart4_SendInt(joystick_state.mode);
-    TelemetryUart4_SendString(" ");
-    TelemetryUart4_SendString("debug:");
-    TelemetryUart4_SendInt(joystick_state.debug);
-    TelemetryUart4_SendString(" ");
-    TelemetryUart4_SendString("RJoy_UD:");
-    TelemetryUart4_SendInt(joystick_state.RJoy_UD);
-    TelemetryUart4_SendString(" ");
-    TelemetryUart4_SendString("RJoy_LR:");
-    TelemetryUart4_SendInt(joystick_state.RJoy_LR);
-    TelemetryUart4_SendString(" ");
-    TelemetryUart4_SendString("LJoy_LR:");
-    TelemetryUart4_SendInt(joystick_state.LJoy_LR);
-    TelemetryUart4_SendString(" ");
-    osDelay(500);*/
+  {
+    sprintf(buf, "%d", joystick_state.mode);
+    TelemetryUart4_SendString("mode:");
+    TelemetryUart4_SendString(buf);
+    TelemetryUart4_SendString("\n");
+    sprintf(buf, "%f", v_input.vx);
+    TelemetryUart4_SendString("vx:");
+    TelemetryUart4_SendString(buf);
+    TelemetryUart4_SendString("\n");
+    sprintf(buf, "%f", v_input.vy);
+    TelemetryUart4_SendString("vy:");
+    TelemetryUart4_SendString(buf);
+    TelemetryUart4_SendString("\n");
+    sprintf(buf, "%f", v_input.omega);
+    TelemetryUart4_SendString("omega:");
+    TelemetryUart4_SendString(buf);
+    TelemetryUart4_SendString("\n--------\n");
+    osDelay(500);
   }
+  #endif
   /* USER CODE END uart4_test_entry */
 }
 
