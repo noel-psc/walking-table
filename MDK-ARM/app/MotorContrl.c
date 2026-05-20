@@ -5,18 +5,17 @@
 #include "tim.h"
 #include "utils.h"
 
-JOYSTICK_TypeDef joystick_state; // 全局摇杆状态变量
+const float k_ = 1;  // Smoothing factor (0 < k < 1)
 
-const float k_ = 0.1; // Smoothing factor (0 < k < 1)
 
 // 计算旋转半径（考虑长宽比影响）
 const float R = 0.34 * 3;
 
 // 45°角的正弦余弦值（sqrt(2)/2）
-const float sin45 = 0.707f; // sqrt(2)/2
-const float cos45 = 0.707f; // sqrt(2)/2
-const float cos60 = 0.5f;   // cos(60°)=0.5
-const float sin60 = 0.866f; // sin(60°)=sqrt(3)/2
+const float sin45 = 0.707106781187f; // sqrt(2)/2
+const float cos45 = 0.707106781187f; // sqrt(2)/2
+const float cos60 = 0.5f;            // cos(60°)=0.5
+const float sin60 = 0.866025403785f; // sin(60°)=sqrt(3)/2
 
 // 为4个轮子声明滤波器实例
 Chassic_State chassis;
@@ -25,21 +24,8 @@ Chassic_State chassis;
 const Chassis_Params chassis_params = {
     0.3f, 0.15f, 0.05f}; // 初始化底盘参数 车长0.3m 车宽0.3m 轮子半径0.05m
 
+JOYSTICK_TypeDef joystick_state; // 全局摇杆状态变量
 Velocity_Input v_input; // 速度输入结构体实例
-
-static const float k_encoder_ppr = 13.0f;
-static const float k_gear_ratio = 30.0f;
-static const float k_control_dt_s = 0.001f;
-static const float k_counts_per_rev = (k_encoder_ppr * 4.0f * k_gear_ratio);
-static const float k_target_speed_scale = 1.0f;
-static const float k_speed_kp = 2.0f;
-static const float k_speed_ki = 2.0f;
-static const float k_speed_kd = 2.0f;
-static const float k_speed_max_out = 7200.0f;
-static const float k_speed_max_i_out = 7200.0f;
-
-static EncoderSpeedState encoder_states[MOTORNUMBER];
-static SpeedLoop speed_loops[MOTORNUMBER];
 
 static void Motor_InitEncoders(void) {
   HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
@@ -47,19 +33,6 @@ static void Motor_InitEncoders(void) {
   HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
   HAL_TIM_Encoder_Start(&htim8, TIM_CHANNEL_ALL);
 
-  EncoderSpeed_Init(&encoder_states[0], &htim2);
-  EncoderSpeed_Init(&encoder_states[1], &htim1);
-  EncoderSpeed_Init(&encoder_states[2], &htim8);
-  EncoderSpeed_Init(&encoder_states[3], &htim4);
-}
-
-static void Motor_InitSpeedLoops(void) {
-  uint32_t i;
-
-  for (i = 0; i < MOTORNUMBER; i++) {
-    SpeedLoop_Init(&speed_loops[i], k_speed_kp, k_speed_ki, k_speed_kd,
-                   k_control_dt_s, k_speed_max_out, k_speed_max_i_out);
-  }
 }
 
 /*************************************************************
@@ -73,8 +46,6 @@ void Motor_init(void) {
 
   Start_PWM(&htim3);
   Start_PWM(&htim5);
-  Motor_InitEncoders();
-  Motor_InitSpeedLoops();
   // Setup_Filters();
 }
 
@@ -85,8 +56,6 @@ void Motor_apply_input(Velocity_Input input) {
   omni_wheel_inverse_kinematics(input, &chassis);
 
   for (i = 0; i < MOTORNUMBER; i++) {
-    EncoderSpeed_Update(&encoder_states[i], k_control_dt_s, k_counts_per_rev);
-    chassis.motors[i].speed = EncoderSpeed_GetRadps(&encoder_states[i]);
     motor_pwm[i] = fof_update(&chassis.motors[i]);
   }
 
@@ -120,6 +89,7 @@ void Motor_contrl(JOYSTICK_TypeDef joystick) {
   Joystick_to_input(&joystick, &input);
   Motor_apply_input(input);
 }
+
 void Set_PWM(TIM_HandleTypeDef *htim, int motor_left, int motor_right) {
   motor_left = (motor_left > 7200) ? 7200 : motor_left;
   motor_left = (motor_left < -7200) ? -7200 : motor_left;
@@ -166,7 +136,6 @@ void Start_PWM(TIM_HandleTypeDef *htim) {
 // }
 
 float fof_update(Single_Motor *input) {
-
   input->lastspeed = input->lastspeed * (1 - k_) + input->targetspeed * k_;
 
   return input->lastspeed;
