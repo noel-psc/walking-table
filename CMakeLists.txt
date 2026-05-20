@@ -21,7 +21,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Set the project name
-set(CMAKE_PROJECT_NAME f405demo)
+set(CMAKE_PROJECT_NAME walking_table)
 
 # Enable compile command to ease indexing with e.g. clangd
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
@@ -75,3 +75,14 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 
     # Add user defined libraries
 )
+
+# Linker options for printf/scanf floating-point support
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # 强制链接浮点数打印库（printf/scanf的浮点支持）
+    target_link_options(walking_table PRIVATE -u _printf_float)
+    # 如果需要 scanf 也支持浮点，可增加 -u _scanf_float
+    # target_link_options(walking_table PRIVATE -u _scanf_float)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    # Release 下不添加该选项，sprintf 遇到 %f 会输出空
+    # 此时应使用整数传输浮点数，或保证代码中不使用 %f
+endif()
